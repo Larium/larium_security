@@ -4,7 +4,7 @@
 
 namespace Larium\Security\User;
 
-class UserProviderInterface
+interface UserProviderInterface
 {
     /**
      * Gets a User instance by username
