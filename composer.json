@@ -1,0 +1,26 @@
+{
+    "name": "larium/security",
+    "description": "",
+    "keywords": [""],
+    "homepage": "",
+    "type": "",
+    "license": "",
+    "authors": [
+        {
+            "name": "Andreas Kollaros",
+            "email": "andreaskollaros@ymail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": {
+            "Larium\\": "src/"
+        }
+    }
+}
