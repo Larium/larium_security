@@ -45,7 +45,14 @@ class AuthenticationService
 
             $this->user = $this->user_provider->getByUsername($username);
 
-            return $this->encoder->validate($password, $this->user->getCryptedPassword());
+            $result = $this->encoder->validate($password, $this->user->getCryptedPassword());
+
+            if (true === $result) {
+                $this->storage->setUser($this->user);
+                $this->storage->save();
+            }
+
+            return $result;
 
         } catch (UserNotFoundException $e) {
             throw $e;
@@ -72,5 +79,23 @@ class AuthenticationService
     public function getAuthenticateStorage()
     {
         return $this->storage;
+    }
+
+    public function isAuthenticated()
+    {
+        $storage_user = $this->storage->getUser();
+        if (null === $storage_user) {
+            return false;
+        }
+
+        $user = $this->user_provider->getByUsername($storage_user->getUsername());
+
+        $compare = $user->compare($storage_user) && !$this->storage->hasExpired();
+
+        if ($compare) {
+            $this->user = $user;
+        }
+
+        return $user;
     }
 }

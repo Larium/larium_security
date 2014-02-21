@@ -12,22 +12,20 @@ class TestAuthenticationService extends \PHPUnit_Framework_TestCase
     public function testService()
     {
         $provider = $this->getEncodedUserProvider();
-
         $storage = new InMemoryStorage('memory');
-
         $encoder = new BCryptEncoder();
 
         $service = new AuthenticationService($provider, $storage, $encoder);
 
-        if ($service->authenticate('admin', 'p@$$')) {
-            $storage->setUser($service->getUser());
-            $storage->save();
+        if (!$service->isAuthenticated()) {
+            $service->authenticate('admin', 'p@$$');
         }
 
-        var_dump($storage->hasExpired());
-        print_r($service->getUser());
+        $this->assertEquals('admin', $service->getUser()->getUsername());
+    }
 
-
+    public function testServiceWithSessionStorage()
+    {
 
     }
 

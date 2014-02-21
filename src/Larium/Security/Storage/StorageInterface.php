@@ -7,15 +7,6 @@ namespace Larium\Security\Storage;
 interface StorageInterface
 {
     /**
-     * Sets the authenticated token to store.
-     *
-     * @param string $token
-     * @access public
-     * @return void
-     */
-    public function setToken($token);
-
-    /**
      *
      * Gets authenticated token
      *

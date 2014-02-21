@@ -54,4 +54,10 @@ class User implements UserInterface
     {
         return $this->roles;
     }
+
+    public function compare(UserInterface $user)
+    {
+        return 0 === strcmp($this->crypted_password, $user->getCryptedPassword())
+            && 0 === strcmp($this->username, $user->getUsername());
+    }
 }

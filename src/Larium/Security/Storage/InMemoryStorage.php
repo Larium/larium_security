@@ -4,30 +4,29 @@ namespace Larium\Security\Storage;
 
 class InMemoryStorage implements StorageInterface, \Serializable
 {
-    protected $token;
+    protected $token_key;
 
     protected $expire_at;
 
     protected $user;
 
-    protected $password;
-
     protected $tokens = array();
 
-    public function __construct($token)
+    public function __construct($token_key)
     {
-        $this->token = $token;
-        $this->expire_at = new \Datetime('3 hours');
-    }
+        if (empty($token_key)) {
+            throw new \InvalidArgumentException('Token key should not be empty.');
+        }
 
-    public function setToken($token)
-    {
-        $this->token = $token;
+        $this->token_key = $token_key;
+        $this->expire_at = new \Datetime('3 hours');
     }
 
     public function getToken()
     {
-        return $this->token;
+        return array_key_exists($this->token_key, $this->tokens)
+            ? $this->tokens[$this->token_key]
+            : null;
     }
 
     public function setExpiration(\Datetime $date)
@@ -44,12 +43,18 @@ class InMemoryStorage implements StorageInterface, \Serializable
     {
         $interval = $this->expire_at->diff(new \Datetime());
 
-        return $interval->invert !== 1;
+        $expired = $interval->invert !== 1;
+
+        if ($expired) {
+            unset($this->tokens[$this->token_key]);
+        }
+
+        return $expired;
     }
 
     public function save()
     {
-        $this->tokens[$this->token] = serialize($this);
+        $this->tokens[$this->token_key] = serialize($this);
     }
 
     public function getUser()
@@ -60,16 +65,6 @@ class InMemoryStorage implements StorageInterface, \Serializable
     public function setUser($user)
     {
         $this->user = $user;
-    }
-
-    public function setPassword($password)
-    {
-        $this->password = $password;
-    }
-
-    public function getPassword()
-    {
-        return $this->password;
     }
 
     public function __toString()
@@ -85,9 +80,8 @@ class InMemoryStorage implements StorageInterface, \Serializable
     public function serialize()
     {
         return serialize(array(
-            $this->token,
+            $this->token_key,
             $this->user,
-            $this->password,
             $this->expire_at->format('Y-m-d H:i:s')
         ));
     }
@@ -95,7 +89,7 @@ class InMemoryStorage implements StorageInterface, \Serializable
     public function unserialize($data)
     {
         $data = unserialize($data);
-        list($this->token, $this->user, $this->password, $this->expire_at) = $data;
+        list($this->token_key, $this->user, $this->expire_at) = $data;
         $this->expire_at = new \Datetime($this->expire_at);
     }
 }
