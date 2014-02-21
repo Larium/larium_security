@@ -4,7 +4,7 @@
 
 namespace Larium\Security\Storage;
 
-interface Storage
+interface StorageInterface
 {
     /**
      * Sets the authenticated token to store.
@@ -31,7 +31,7 @@ interface Storage
      * @access public
      * @return void
      */
-    public function setExpiration(\Datetime $date)
+    public function setExpiration(\Datetime $date);
 
     /**
      * Get expired date time of token
@@ -47,7 +47,7 @@ interface Storage
      * @access public
      * @return boolean
      */
-    public function hasExpire();
+    public function hasExpired();
 
     /**
      * Get User instance of authenticated user based on token

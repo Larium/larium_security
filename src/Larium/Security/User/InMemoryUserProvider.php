@@ -23,7 +23,7 @@ class InMemoryUserProvider implements UserProviderInterface
         throw new UserNotFoundException();
     }
 
-    protected function create_user(array $params)
+    private function create_user(array $params)
     {
         return new User($params['username'], $params['password']);
     }
