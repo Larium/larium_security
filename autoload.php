@@ -4,6 +4,7 @@
 
 //Dependecy
 require_once 'larium_http/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 require_once 'SplClassLoader.php';
 
