@@ -47,4 +47,8 @@ interface StorageInterface
      * @return UserInterface
      */
     public function getUser();
+
+    public function save();
+
+    public function erase();
 }

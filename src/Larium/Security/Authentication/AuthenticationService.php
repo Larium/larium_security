@@ -84,6 +84,7 @@ class AuthenticationService
     public function isAuthenticated()
     {
         $storage_user = $this->storage->getUser();
+
         if (null === $storage_user) {
             return false;
         }

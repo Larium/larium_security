@@ -57,6 +57,11 @@ class InMemoryStorage implements StorageInterface, \Serializable
         $this->tokens[$this->token_key] = serialize($this);
     }
 
+    public function erase()
+    {
+        unset($this->tokens[$this->token_key]);
+    }
+
     public function getUser()
     {
         return $this->user;

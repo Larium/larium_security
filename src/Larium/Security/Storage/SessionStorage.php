@@ -4,7 +4,7 @@ namespace Larium\Security\Storage;
 
 use Larium\Http\Session\SessionInterface;
 
-class SessionStorage implements StorageInterface, \Serializable
+class SessionStorage implements StorageInterface
 {
     protected $session;
 
@@ -17,11 +17,18 @@ class SessionStorage implements StorageInterface, \Serializable
         $this->token_key = $token_key;
         $this->session = $session;
         $this->expire_at = new \Datetime('3 hours');
+
+        $this->getToken();
     }
 
     public function getToken()
     {
-        return unserialize($this->session->get($this->token_key));
+        $data = $this->session->get($this->token_key) ?: array();
+        if (empty($data) || count($data) !== 3) {
+            return;
+        }
+        list($token_key, $this->user, $this->expire_at) = $data;
+        $this->expire_at = new \Datetime($this->expire_at);
     }
 
     public function setExpiration(\Datetime $date)
@@ -59,22 +66,17 @@ class SessionStorage implements StorageInterface, \Serializable
 
     public function save()
     {
-        $this->session->set($this->token_key, serialize($this));
-    }
-
-    public function serialize()
-    {
-        return serialize(array(
+        $data = array(
             $this->token_key,
             clone $this->user,
             $this->expire_at->format('Y-m-d H:i:s')
-        ));
+        );
+
+        $this->session->set($this->token_key, $data);
     }
 
-    public function unserialize($data)
+    public function erase()
     {
-        $data = unserialize($data);
-        list($this->token_key, $this->user, $this->expire_at) = $data;
-        $this->expire_at = new \Datetime($this->expire_at);
+        return $this->session->delete($this->token_key);
     }
 }
