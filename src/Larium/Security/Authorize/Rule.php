@@ -7,6 +7,11 @@ namespace Larium\Security\Authorize;
 class Rule {
 
     /**
+     * Behavior of Rule.
+     *
+     * If true then can do things
+     * If false then cannot do things.
+     *
      * @var boolean
      */
     protected $base_behavior;
@@ -37,23 +42,23 @@ class Rule {
         $this->block = $block;
     }
 
-    public function is_relevant($action, $subject) 
+    public function is_relevant($action, $subject)
     {
         if (is_array($subject)) {
             $subject = current($subject);
         }
-        
-        return $this->match_all 
+
+        return $this->match_all
             || ($this->matches_action($action) && $this->matches_subject($subject));
     }
 
-    public function matches_conditions($action, $subject, $extra_args) 
+    public function matches_conditions($action, $subject, $extra_args)
     {
         if ($this->match_all) {
 
             return $this->call_block_with_all($action, $subject, $extra_args);
         } elseif ( $this->block && !$this->subject_class($subject) ) {
-            
+
             $block = $this->block;
 
             return $block($subject, $extra_args);
@@ -61,7 +66,7 @@ class Rule {
 
             return $this->nested_subject_matches_conditions($subject);
 
-        } elseif (   is_array($this->conditions) 
+        } elseif (   is_array($this->conditions)
                   && !$this->subject_class($subject)
         ) {
 
@@ -73,24 +78,24 @@ class Rule {
         }
     }
 
-    public function isOnlyBlock() 
+    public function isOnlyBlock()
     {
         return $this->isConditionsEmpty() && (null !== $this->block);
     }
 
-    public function isOnlyRawSql() 
+    public function isOnlyRawSql()
     {
-        return null === $this->block 
-            && !$this->isConditionsEmpty() 
+        return null === $this->block
+            && !$this->isConditionsEmpty()
             && !is_array($this->getConditions());
     }
 
-    public function isConditionsEmpty() 
+    public function isConditionsEmpty()
     {
         return is_array($this->conditions) || ( null === $this->conditions );
     }
 
-    public function getAssociationsHash($conditions = null) 
+    public function getAssociationsHash($conditions = null)
     {
         $conditions = null === $conditions ? $this->conditions : $conditions;
 
@@ -110,11 +115,11 @@ class Rule {
         return $hash;
     }
 
-    public function getAttributesForConditions() 
+    public function getAttributesForConditions()
     {
         $attributes = array();
         if ( is_array( $conditions)  ) {
-            
+
             foreach ( $this->conditions as $key => $value ){
                 if( !is_array($value) ) {
                     $attributes[$key] = $value;
@@ -122,46 +127,46 @@ class Rule {
             }
 
         }
-        
+
         return $attributes;
     }
 
-    public function hasBaseBehavior() 
-    { 
-        return $this->base_behavior; 
+    public function hasBaseBehavior()
+    {
+        return $this->base_behavior;
     }
 
-    public function getActions() 
-    { 
-        return $this->actions; 
+    public function getActions()
+    {
+        return $this->actions;
     }
 
-    public function getConditions() 
-    { 
-        return $this->conditions; 
+    public function getConditions()
+    {
+        return $this->conditions;
     }
 
-    private function subject_class($subject) 
+    private function subject_class($subject)
     {
         $klass = is_array($subject) ? current($subject) : $subject;
 
         return is_string($klass);
     }
 
-    private function matches_action($action) 
+    private function matches_action($action)
     {
-        return in_array('manage', $this->expanded_actions) 
+        return in_array('manage', $this->expanded_actions)
             || in_array( $action, $this->expanded_actions);
     }
 
-    private function matches_subject($subject) 
+    private function matches_subject($subject)
     {
-        return in_array('all', $this->subjects) 
-            || in_array($subject, $this->subjects) 
+        return in_array('all', $this->subjects)
+            || in_array($subject, $this->subjects)
             || $this->matches_subject_class($subject);
     }
 
-    private function matches_subject_class($subject) 
+    private function matches_subject_class($subject)
     {
         if ( is_object($subject) ) {
             return in_array(get_class($subject), $this->subjects);
@@ -169,7 +174,7 @@ class Rule {
         return false;
     }
 
-    private function matches_conditions_hash($subject, $conditions = null) 
+    private function matches_conditions_hash($subject, $conditions = null)
     {
         $conditions = null === $conditions ? $this->conditions : $conditions;
         if ( empty($conditions) ) {

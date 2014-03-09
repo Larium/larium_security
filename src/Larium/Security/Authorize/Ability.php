@@ -4,7 +4,7 @@
 
 namespace Larium\Security\Authorize;
 
-class Ability 
+class Ability
 {
 
     protected $rules = array();
@@ -18,7 +18,7 @@ class Ability
 
     protected $aliased_actions = array();
 
-    public function canDo( $action, $subject, $extra_args = array() ) 
+    public function canDo($action, $subject, $extra_args = array())
     {
         $match = null;
         $relevant_rules_for_match = $this->relevant_rules_for_match($action, $subject);
@@ -31,30 +31,30 @@ class Ability
         return isset($match) ? $match->hasBaseBehavior() : false;
     }
 
-    public function cannotDo( $action, $subject, $extra_args = array() ) 
+    public function cannotDo($action, $subject, $extra_args = array())
     {
         return !$this->canDo($action, $subject, $extra_args);
     }
 
-    public function can( $action = null, $subject = null, $conditions = null, $block = null) 
+    public function can($action = null, $subject = null, $conditions = null, $block = null)
     {
         $this->rules[] = new Rule(true, $action, $subject, $conditions, $block);
     }
 
-    public function cannot( $action = null, $subject = null, $conditions = null, $block=null) 
+    public function cannot($action = null, $subject = null, $conditions = null, $block=null)
     {
         $this->rules[] = new Rule(false, $action, $subject, $conditions, $block);
     }
 
     /**
      * Alias one or more actions into another one.
-     * 
+     *
      * <code>
      *      $ability->setAliasAction(['update', 'destroy', 'to'=>'modify']);
      *      $ability->can('modify', 'Comment');
      * </code>
      *
-     * Then modify permission will apply to both 'update' and 'destroy' 
+     * Then modify permission will apply to both 'update' and 'destroy'
      * requests.
      *
      * <code>
@@ -69,7 +69,7 @@ class Ability
      *      $ability->can('update', 'Comment');
      *      $ability->canDo('modify', 'Comment'); // return false
      * </code>
-     * 
+     *
      * Unless that exact alias is used.
      *
      * <code>
@@ -85,13 +85,13 @@ class Ability
      * </code>
      *
      * @param array $args An array in format ['action', 'other_action',... ,'to'=>'alias_action'].
-     *                    You can add as many actions you want but you must set 
-     *                    the alias action in last element by setting the value 
+     *                    You can add as many actions you want but you must set
+     *                    the alias action in last element by setting the value
      *                    of the key to `to`.
      *
      * @return void
      */
-    public function setAliasAction(array $args) 
+    public function setAliasAction(array $args)
     {
         $target = array_pop($args); // grab element with 'to' key
 
@@ -101,48 +101,48 @@ class Ability
         $this->aliased_actions[$target] = array_merge($this->aliased_actions[$target], $args);
     }
 
-    public function getAliasedActions() 
+    public function getAliasedActions()
     {
-        return empty( $this->aliased_actions ) 
-            ? $this->default_alias_actions 
+        return empty( $this->aliased_actions )
+            ? $this->default_alias_actions
             : array_merge_recursive($this->default_alias_actions, $this->aliased_actions);
     }
 
-    public function clearAliasedActions() 
+    public function clearAliasedActions()
     {
         $this->aliased_actions = array();
     }
 
-    public function authorize($action, $subject, $args=array()) 
-    {   
+    public function authorize($action, $subject, $args=array())
+    {
         if ($this->cannotDo($action, $subject, $args)) {
-    
+
             $message = null;
             if (is_array(end($args)) && array_key_exists('message', end($args))) {
                 $message = array_pop($args);
-            } 
-            
-            $message = null != $message 
-                ? $message 
+            }
+
+            $message = null != $message
+                ? $message
                 : $this->getUnauthorizedMessage($action, $subject);
 
             throw new AccessDenied($message, $action, $subject);
         }
     }
 
-    public function getUnauthorizedMessage($action, $subject) 
+    public function getUnauthorizedMessage($action, $subject)
     {
 
     }
 
-    public function getAttributesFor($action, $subject) 
+    public function getAttributesFor($action, $subject)
     {
         $attributes = array();
         $relevant_rules = $this->relevant_rules($action, $subject);
         foreach ($relevant_rules as $rule) {
             if ($rule->hasBaseBehavior())
                 $attributes = array_merge(
-                    $attributes, 
+                    $attributes,
                     $rule->getAttributesForConditions()
                 );
         }
@@ -150,7 +150,7 @@ class Ability
         return $attributes;
     }
 
-    public function hasBlock($action, $subject) 
+    public function hasBlock($action, $subject)
     {
         $relevant_rules = $this->relevant_rules($action, $subject);
         foreach ($relevant_rules as $rule) {
@@ -172,12 +172,12 @@ class Ability
      * Private
      */
 
-    private function unauthorized_message_keys($action, $subject) 
+    private function unauthorized_message_keys($action, $subject)
     {
-        
+
     }
 
-    private function expand_actions(array $actions ) 
+    private function expand_actions(array $actions )
     {
         $map = array();
         $aliased_actions = $this->getAliasedActions();
@@ -192,7 +192,7 @@ class Ability
         return $map;
     }
 
-    private function aliases_for_action($action) 
+    private function aliases_for_action($action)
     {
         $results = array($action);
         $aliased_actions = $this->aliased_actions();
@@ -204,16 +204,16 @@ class Ability
         return $results;
     }
 
-    private function rules() 
+    private function rules()
     {
         return null === $this->rules ? array() : $this->rules;
     }
 
-    private function relevant_rules($action, $subject) 
+    private function relevant_rules($action, $subject)
     {
         $rules = array_reverse( $this->rules() );
         $match = array();
-        
+
         foreach( $rules as $rule ) {
             // var_dump($rule->actions());
             $rule->expanded_actions = $this->expand_actions($rule->getActions());
@@ -228,7 +228,7 @@ class Ability
         return $match;
     }
 
-    private function relevant_rules_for_match($action, $subject) 
+    private function relevant_rules_for_match($action, $subject)
     {
         $relevant_rules = $this->relevant_rules($action, $subject);
         foreach( $relevant_rules as $rule ) {
@@ -239,7 +239,7 @@ class Ability
         return $relevant_rules;
     }
 
-    private function relevant_rules_for_query($action, $subject) 
+    private function relevant_rules_for_query($action, $subject)
     {
         $relevant_rules = $this->relevant_rules($action, $subject);
         foreach( $relevant_rules as $rule ) {
