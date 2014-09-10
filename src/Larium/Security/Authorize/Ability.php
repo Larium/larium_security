@@ -13,7 +13,7 @@ class Ability
         'read' => array('index', 'show'),
         'create' => array('new'),
         'update' => array('edit'),
-        'delete' => array('delete')
+        'destroy' => array('delete')
     );
 
     protected $aliased_actions = array();
