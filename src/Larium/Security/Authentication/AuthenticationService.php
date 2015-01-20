@@ -110,7 +110,7 @@ class AuthenticationService
             $this->user = $user;
         }
 
-        return $user;
+        return $compare;
     }
 
     public function addListener($state, $callback)
