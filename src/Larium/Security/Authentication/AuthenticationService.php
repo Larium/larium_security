@@ -8,14 +8,19 @@ use Larium\Security\User\UserProviderInterface;
 use Larium\Security\Storage\StorageInterface;
 use Larium\Security\Encoder\PasswordEncoderInterface;
 use Larium\Security\Encoder\PlainTextEncoder;
+use Larium\Executor\Executor;
 
 class AuthenticationService
 {
+    const AFTER_AUTHENTICATE = 'after.authenticate';
+
     protected $user_provider;
 
     protected $storage;
 
     protected $encoder;
+
+    protected $executor;
 
     /**
      *
@@ -37,6 +42,8 @@ class AuthenticationService
         $encoder = $encoder ?: new PlainTextEncoder();
 
         $this->encoder = $encoder;
+
+        $this->executor = new Executor();
     }
 
     public function authenticate($username, $password)
@@ -48,6 +55,12 @@ class AuthenticationService
             $result = $this->encoder->validate($password, $this->user->getCryptedPassword());
 
             if (true === $result) {
+
+                $message = new AuthenticationMessage();
+                $message->setUser($this->user);
+
+                $this->executor->execute(self::AFTER_AUTHENTICATE, $message);
+
                 $this->storage->setUser($this->user);
                 $this->storage->save();
             }
@@ -98,5 +111,10 @@ class AuthenticationService
         }
 
         return $user;
+    }
+
+    public function addListener($state, $callback)
+    {
+        $this->executor->addCommand($state, $callback);
     }
 }
