@@ -48,7 +48,7 @@ class SessionStorage implements StorageInterface
         $expired = $interval->invert !== 1;
 
         if ($expired) {
-            unset($this->tokens[$this->token_key]);
+            $this->erase();
         }
 
         return $expired;
