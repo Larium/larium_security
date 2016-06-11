@@ -12,7 +12,7 @@ trait AuthenticateController
 
     /**
      * Returns name of the class that uses AuthenticateResource trait.
-     * 
+     *
      * @return string
      */
     abstract public function getAuthenticateClass();
@@ -27,29 +27,28 @@ trait AuthenticateController
     public function setCurrentUser($user)
     {
         $this->session->user_id = $user != null ? $user->getId() : null;
-        $this->current_user = $user ?: false; 
+        $this->current_user = $user ?: false;
     }
 
     public function getCurrentUser()
     {
-        if (   null === $this->current_user
-            || false === $this->current_user 
+        if (null === $this->current_user
+            || false === $this->current_user
         ) {
-            $this->current_user = $this->login_from_session();
+            $this->current_user = $this->loginFromSession();
         }
 
         $this->getView()->assign('current_user', $this->current_user);
 
-        return $this->current_user; 
+        return $this->current_user;
     }
 
     public function getAbility()
     {
         if (null == $this->ability) {
-            
             $this->ability = new \Ability($this->getCurrentUser());
         }
-        
+
         return $this->ability;
     }
 
@@ -66,11 +65,10 @@ trait AuthenticateController
         }
 
         if ($this->isLoggedIn()) {
-            
             return false;
         } else {
-            $this->access_denied();
-            
+            $this->accessDenied();
+
             return true;
         }
     }
@@ -78,35 +76,33 @@ trait AuthenticateController
     public function getLoginRequired()
     {
         if (isset($this->login_required)) {
-            
             return $this->login_required;
         }
 
         return false;
     }
 
-    private function login_from_session()
+    private function loginFromSession()
     {
-        if ( $this->session->user_id ) {
-            
+        if ($this->session->user_id) {
             $class = $this->getAuthenticateClass();
 
-            return $class::findResource($this->session->user_id); 
+            return $class::findResource($this->session->user_id);
         }
 
         return false;
     }
 
-    protected function redirect_back_or_default($default)
+    protected function redirectBackOrDefault($default)
     {
         $uri = isset($this->session->back_url)
             ? $this->session->back_url
             : $default;
-        
+
         return $this->redirect($uri);
     }
 
-    protected function access_denied()
+    protected function accessDenied()
     {
         $this->redirect($this->getLoginUrl());
     }

@@ -7,13 +7,13 @@ namespace Larium\Security;
 trait ValidatableResource
 {
     use \Larium\Validations\Validate;
-    
+
     public $password_confirmation;
 
     protected function validations()
     {
         if ($this->is_password_required()) {
-            
+
             $this->validates(
                 array(
                     'password', 'password_confirmation'
@@ -22,7 +22,7 @@ trait ValidatableResource
             );
 
             $this->validates(
-                'password', 
+                'password',
                 array(
                     'Length' => array(
                         'in'=>range(4,20)
@@ -42,9 +42,8 @@ trait ValidatableResource
         );
     }
 
-    protected function is_password_required() 
+    protected function is_password_required()
     {
         return $this->crypted_password == '' || !$this->password == '';
     }
 }
-

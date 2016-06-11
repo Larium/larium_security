@@ -14,7 +14,7 @@ class Ability
         'create' => array('new'),
         'update' => array('edit'),
         'destroy' => array('delete')
-    );
+   );
 
     protected $aliased_actions = array();
 
@@ -22,8 +22,8 @@ class Ability
     {
         $match = null;
         $relevant_rules_for_match = $this->relevant_rules_for_match($action, $subject);
-        foreach ( $relevant_rules_for_match as $rule) {
-            if ( $rule->matches_conditions($action, $subject, $extra_args) ){
+        foreach ($relevant_rules_for_match as $rule) {
+            if ($rule->matches_conditions($action, $subject, $extra_args)){
                 $match = $rule;
                 break;
             }
@@ -103,7 +103,7 @@ class Ability
 
     public function getAliasedActions()
     {
-        return empty( $this->aliased_actions )
+        return empty($this->aliased_actions)
             ? $this->default_alias_actions
             : array_merge_recursive($this->default_alias_actions, $this->aliased_actions);
     }
@@ -144,7 +144,7 @@ class Ability
                 $attributes = array_merge(
                     $attributes,
                     $rule->getAttributesForConditions()
-                );
+               );
         }
 
         return $attributes;
@@ -154,7 +154,7 @@ class Ability
     {
         $relevant_rules = $this->relevant_rules($action, $subject);
         foreach ($relevant_rules as $rule) {
-            if( $rule->only_block() )
+            if($rule->only_block())
                 return true;
         }
     }
@@ -163,7 +163,7 @@ class Ability
     {
         $relevant_rules = $this->relevant_rules($action, $subject);
         foreach ($relevant_rules as $rule) {
-            if( $rule->isOnlyRawSql() )
+            if($rule->isOnlyRawSql())
                 return true;
         }
     }
@@ -177,16 +177,16 @@ class Ability
 
     }
 
-    private function expand_actions(array $actions )
+    private function expand_actions(array $actions)
     {
         $map = array();
         $aliased_actions = $this->getAliasedActions();
         foreach ($actions as $action) {
-            if ( isset( $aliased_actions[$action] ) ){
-                $expand_actions = $this->expand_actions( $aliased_actions[$action] );
-                $map = array_merge( $map, $expand_actions );
+            if (isset($aliased_actions[$action])){
+                $expand_actions = $this->expand_actions($aliased_actions[$action]);
+                $map = array_merge($map, $expand_actions);
             }
-            $map = array_merge($map, array($action) );
+            $map = array_merge($map, array($action));
         }
 
         return $map;
@@ -196,8 +196,8 @@ class Ability
     {
         $results = array($action);
         $aliased_actions = $this->aliased_actions();
-        foreach( $aliased_actions as $aliased_action => $actions ){
-            if ( in_array($action, $actions) ){
+        foreach($aliased_actions as $aliased_action => $actions){
+            if (in_array($action, $actions)){
                 $results[] = $this->aliases_for_action($aliased_action);
             }
         }
@@ -211,16 +211,16 @@ class Ability
 
     private function relevant_rules($action, $subject)
     {
-        $rules = array_reverse( $this->rules() );
+        $rules = array_reverse($this->rules());
         $match = array();
 
-        foreach( $rules as $rule ) {
+        foreach($rules as $rule) {
             // var_dump($rule->actions());
             $rule->expanded_actions = $this->expand_actions($rule->getActions());
             // echo '<pre>';
             // print_r($rule->expanded_actions);
             // echo '</pre>';
-            if ( $rule->is_relevant($action, $subject) ){
+            if ($rule->is_relevant($action, $subject)){
                 $match[] = $rule;
             }
         }
@@ -231,8 +231,8 @@ class Ability
     private function relevant_rules_for_match($action, $subject)
     {
         $relevant_rules = $this->relevant_rules($action, $subject);
-        foreach( $relevant_rules as $rule ) {
-            if ( $rule->isOnlyRawSql() ) {
+        foreach($relevant_rules as $rule) {
+            if ($rule->isOnlyRawSql()) {
                 throw new Error("The canDo and cannotDo method cannot be used with a raw sql 'can' definition. The checking code cannot be determined for {$action} {$subject}");
             }
         }
@@ -242,8 +242,8 @@ class Ability
     private function relevant_rules_for_query($action, $subject)
     {
         $relevant_rules = $this->relevant_rules($action, $subject);
-        foreach( $relevant_rules as $rule ) {
-            if ( $rule->isOnlyBlock() ) {
+        foreach ($relevant_rules as $rule) {
+            if ($rule->isOnlyBlock()) {
                 throw new Error("The accessible_by call cannot be used with a block 'can' definition. The SQL cannot be determined for {$action} {$subject}");
             }
         }
@@ -251,4 +251,3 @@ class Ability
     }
 
 }
-?>

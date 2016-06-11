@@ -3,6 +3,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 namespace Larium\Security\Authentication;
+
 use Larium\Executor\Message;
 
 class AuthenticationMessage extends Message

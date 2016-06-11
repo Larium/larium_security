@@ -9,7 +9,6 @@ interface UserInterface
     /**
      * Gets user name.
      *
-     * @access public
      * @return string
      */
     public function getUsername();
@@ -17,7 +16,6 @@ interface UserInterface
     /**
      * Gets encoded password.
      *
-     * @access public
      * @return string
      */
     public function getCryptedPassword();
@@ -25,7 +23,6 @@ interface UserInterface
     /**
      * Gets the roles assign to the User
      *
-     * @access public
      * @return array
      */
     public function getRoles();

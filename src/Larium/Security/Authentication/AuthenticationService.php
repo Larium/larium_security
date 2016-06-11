@@ -4,17 +4,17 @@
 
 namespace Larium\Security\Authentication;
 
-use Larium\Security\User\UserProviderInterface;
-use Larium\Security\Storage\StorageInterface;
-use Larium\Security\Encoder\PasswordEncoderInterface;
-use Larium\Security\Encoder\PlainTextEncoder;
 use Larium\Executor\Executor;
+use Larium\Security\Storage\StorageInterface;
+use Larium\Security\Encoder\PlainTextEncoder;
+use Larium\Security\User\UserProviderInterface;
+use Larium\Security\Encoder\PasswordEncoderInterface;
 
 class AuthenticationService
 {
     const AFTER_AUTHENTICATE = 'after.authenticate';
 
-    protected $user_provider;
+    protected $userProvider;
 
     protected $storage;
 
@@ -24,19 +24,17 @@ class AuthenticationService
 
     /**
      *
-     * @param UserProviderInterface     $user_provider
+     * @param UserProviderInterface     $userProvider
      * @param StorageInterface          $storage
      * @param PasswordEncoderInterface  $encoder
-     * @access public
-     * @return void
      */
     public function __construct(
-        UserProviderInterface $user_provider,
+        UserProviderInterface $userProvider,
         StorageInterface $storage,
         PasswordEncoderInterface $encoder = null
     ) {
 
-        $this->user_provider = $user_provider;
+        $this->userProvider = $userProvider;
         $this->storage = $storage;
 
         $encoder = $encoder ?: new PlainTextEncoder();
@@ -49,13 +47,14 @@ class AuthenticationService
     public function authenticate($username, $password)
     {
         try {
+            $this->user = $this->userProvider->getByUsername($username);
 
-            $this->user = $this->user_provider->getByUsername($username);
-
-            $result = $this->encoder->validate($password, $this->user->getCryptedPassword());
+            $result = $this->encoder->validate(
+                $password,
+                $this->user->getCryptedPassword()
+            );
 
             if (true === $result) {
-
                 $message = new AuthenticationMessage();
                 $message->setUser($this->user);
 
@@ -66,7 +65,6 @@ class AuthenticationService
             }
 
             return $result;
-
         } catch (UserNotFoundException $e) {
             throw $e;
         }
@@ -102,7 +100,7 @@ class AuthenticationService
             return false;
         }
 
-        $user = $this->user_provider->getByUsername($storage_user->getUsername());
+        $user = $this->userProvider->getByUsername($storage_user->getUsername());
 
         $compare = $user->compare($storage_user) && !$this->storage->hasExpired();
 

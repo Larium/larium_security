@@ -9,7 +9,7 @@ class InMemoryUserProvider implements UserProviderInterface
     public function __construct(array $users)
     {
         foreach ($users as $user) {
-            $this->users[strtolower($user['username'])] = $this->create_user($user);
+            $this->users[strtolower($user['username'])] = $this->createUser($user);
         }
     }
 
@@ -23,7 +23,7 @@ class InMemoryUserProvider implements UserProviderInterface
         throw new UserNotFoundException();
     }
 
-    private function create_user(array $params)
+    private function createUser(array $params)
     {
         return new User($params['username'], $params['password']);
     }
